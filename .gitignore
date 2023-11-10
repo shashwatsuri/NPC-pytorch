@@ -14,3 +14,4 @@ render_output*/
 *.sh
 #rednering results
 rendering_results/
+*.log
