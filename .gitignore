@@ -15,4 +15,5 @@ render_output*/
 #rednering results
 rendering_results/
 *.log
-output/
+outputs/
+extracted_points/

@@ -59,7 +59,7 @@ def build_dataloader(config: DictConfig):
         batch_sampler=sampler, 
         num_workers=num_workers,
         collate_fn=ray_collate_fn,
-        pin_memory=True,
+        pin_memory=False,
     )
 
     return {
