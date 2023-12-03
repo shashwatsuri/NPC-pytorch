@@ -12,4 +12,8 @@ log*/
 render_output*/
 # helper script
 *.sh
-
+#rednering results
+rendering_results/
+*.log
+outputs/
+extracted_points/
