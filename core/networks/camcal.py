@@ -12,19 +12,22 @@ class CamCal(nn.Module):
     def __init__(
         self,
         n_cams: int = 4,
-        identity_cam: int = 0,
         load_path: Optional[str] = None,
         stop_opt: bool = False,
+
+        
         opt_T: bool = False,
     ):
         super().__init__()
         self.n_cams = n_cams
-        self.identity_cam = identity_cam
         self.load_path = load_path
         self.stop_opt = stop_opt
         self.opt_T = opt_T
 
+        #probably improve initializattion with perturbations
+
         R = torch.eye(3)[None] 
+        
         Rvec = rot_to_rot6d(R).expand(n_cams, -1)
 
         if self.load_path is not None:
@@ -45,7 +48,7 @@ class CamCal(nn.Module):
         **kwargs,
     ):
         if 'real_cam_idx' not in batch:
-            cam_idxs = torch.zeros(z_vals.shape[0]).long() + self.identity_cam
+            cam_idxs = torch.zeros(z_vals.shape[0]).long()# + self.identity_cam
         else:
             cam_idxs = batch['real_cam_idx']
         
@@ -59,7 +62,7 @@ class CamCal(nn.Module):
         masks = masks.reshape(-1, 1, 1)
         identity = torch.eye(3)[None]
 
-        R = R[cam_idxs] * (1 - masks) + identity * masks
+        R = R[cam_idxs] #* (1 - masks) + identity * masks
 
         rays_o = batch['rays_o']
         rays_d = batch['rays_d']
@@ -114,10 +117,10 @@ class ColorCal(nn.Module):
         rgb_map: torch.Tensor,
         **kwargs,
     ):
-        if batch is None or 'real_cam_idx' not in batch:
+        if batch is None or 'cam_idxs' not in batch:
             cam_idxs = torch.zeros(rgb_map.shape[0]).long() + self.identity_cam
         else:
-            cam_idxs = batch['real_cam_idx']
+            cam_idxs = batch['cam_idxs']
 
         cal = self.cal
         if self.load_path is not None:

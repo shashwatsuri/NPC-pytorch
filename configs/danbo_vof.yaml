@@ -15,6 +15,7 @@ model:
   use_framecodes: True
   framecode_ch: 128
   agg_type: sigmoid
+  camcal: 4
 
   graph_net:
     _target_: core.networks.gnn_backbone.DANBOGNN

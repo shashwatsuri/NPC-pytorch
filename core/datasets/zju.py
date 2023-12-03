@@ -216,6 +216,8 @@ class ZJUH36MDataset(ZJUMocapDataset):
         dataset = h5py.File(self.h5_path, 'r')
         self.kp_idxs = dataset['kp_idxs'][:]
         self.cam_idxs = dataset['img_pose_indices'][:]
+        print("CAMERA PARAMETERS")
+        print(self.cam_idxs)
 
         dataset.close()
     
