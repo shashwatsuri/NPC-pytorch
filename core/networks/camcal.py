@@ -11,7 +11,7 @@ class CamCal(nn.Module):
 
     def __init__(
         self,
-        n_cams: int = 4,
+        n_cams: int = 3,
         identity_cam: int = 0,
         load_path: Optional[str] = None,
         stop_opt: bool = False,

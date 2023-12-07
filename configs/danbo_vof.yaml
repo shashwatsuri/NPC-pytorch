@@ -10,6 +10,12 @@ model:
   view_W: 128
   voxel_feat: 15
   voxel_res: 16
+  camcal:
+    n_cams: 3
+    identity_cam: 0
+    load_path: None
+    stop_opt: False
+    opt_T: False
 
   skips: [4] # skip connection
   use_framecodes: True
