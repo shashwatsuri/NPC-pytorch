@@ -7,6 +7,7 @@ import imageio
 import numpy as np
 import mcubes, trimesh
 import math
+import pdb
 
 from tqdm import tqdm, trange
 
