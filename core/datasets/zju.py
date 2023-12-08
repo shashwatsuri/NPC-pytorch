@@ -60,6 +60,8 @@ class ZJUMocapDataset(BaseH5Dataset):
         q_idx: the 'queried' index(s) received from the sampler,
                may not coincide with idx.
         '''
+        assert np.all(self.cam_idxs[idx] == (idx % 3))
+        #print(f'{self.cam_idxs[idx]} {idx}')
         return self.cam_idxs[idx], q_idx
 
     def _get_subset_idxs(self, render=False):
@@ -123,7 +125,7 @@ class ZJUMocapDataset(BaseH5Dataset):
     def __getitem__(self, *args, **kwargs):
         ret = super().__getitem__(*args, **kwargs)
         # TODO: fix this
-        real_cam_idxs = ret['cam_idxs'] %4 # % 23
+        real_cam_idxs = ret['cam_idxs'] % 4 # % 23
         ret['real_cam_idx'] = real_cam_idxs
         return ret
     
@@ -218,6 +220,13 @@ class ZJUH36MDataset(ZJUMocapDataset):
         self.cam_idxs = dataset['img_pose_indices'][:]
 
         dataset.close()
+
+    def __getitem__(self, *args, **kwargs):
+        ret = super().__getitem__(*args, **kwargs)
+        # TODO: fix this
+        #real_cam_idxs = ret['cam_idxs'] % 4 # % 23
+        ret['real_cam_idx'] = ret['cam_idxs'] % 3
+        return ret
     
     def init_temporal_validity(self):
         temp_val = np.ones((len(self.kp3d),)).astype(np.float32)

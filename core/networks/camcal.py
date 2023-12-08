@@ -7,17 +7,21 @@ from core.utils.skeleton_utils import *
 from typing import Optional, Any
 
 
+
 class CamCal(nn.Module):
 
     def __init__(
         self,
         n_cams: int = 3,
         load_path: Optional[str] = None,
+        identity_cam: int = 0,
         stop_opt: bool = False,
         opt_T: bool = False,
+        error: float = 0.0
     ):
         super().__init__()
         self.n_cams = n_cams
+        self.identity_cam = identity_cam
         self.load_path = load_path
         self.stop_opt = stop_opt
         self.opt_T = opt_T
@@ -25,16 +29,36 @@ class CamCal(nn.Module):
         R = torch.eye(3)[None] 
         Rvec = rot_to_rot6d(R).expand(n_cams, -1)
 
+
         if self.load_path is not None:
             device = Rvec.device
             Rvec = torch.load(load_path, map_location=device)
 
         self.register_parameter('Rvec', nn.Parameter(Rvec.clone(), requires_grad=not self.stop_opt))
-
+        
         if self.opt_T:
             T = torch.zeros(3)[None]
             T = T.expand(n_cams, -1)
             self.register_parameter('T', nn.Parameter(T.clone(), requires_grad=not self.stop_opt))
+
+    
+    def add_normal_noise(self, tensor, std=0.005):
+        """
+        Add random noise from a normal distribution to a PyTorch tensor.
+
+        Parameters:
+        - tensor (torch.Tensor): Input tensor to which noise will be added.
+        - mean (float): Mean of the normal distribution (default is 0).
+        - std (float): Standard deviation of the normal distribution (default is 0.005).
+
+        Returns:
+        - torch.Tensor: Tensor with added noise.
+        """
+        noise = torch.randn_like(tensor) * std
+        noisy_tensor = tensor + noise
+        assert tensor.size() == noisy_tensor.size()
+        return noisy_tensor
+
     
     def forward(
         self,
@@ -42,6 +66,7 @@ class CamCal(nn.Module):
         z_vals: torch.Tensor,
         **kwargs,
     ):
+        # print("im forwarding as well")
         if 'real_cam_idx' not in batch:
             cam_idxs = torch.zeros(z_vals.shape[0]).long() + self.identity_cam
         else:
@@ -51,8 +76,13 @@ class CamCal(nn.Module):
         Rvec = self.Rvec
         if self.stop_opt:
             Rvec = Rvec.detach()
- 
         R = rot6d_to_rotmat(Rvec)
+        masks = (cam_idxs == self.identity_cam).float()
+        masks = masks.reshape(-1, 1, 1)
+        identity = torch.eye(3)[None]
+        # breakpoint()
+        R = R[cam_idxs] * (1 - masks) + identity * masks
+
         rays_o = batch['rays_o']
         rays_d = batch['rays_d']
 
@@ -60,6 +90,9 @@ class CamCal(nn.Module):
         rays_d_cal = (rays_d[:, None] @ R)
         if self.opt_T:
             T = self.T
+            masks = masks.reshape(-1, 1) 
+            identity = torch.zeros(3)[None]
+            T = T[cam_idxs] * (1 - masks) + identity * masks
             if self.stop_opt:
                 T = T.detach()
             rays_o_cal = rays_o[:, None] + T[:, None]

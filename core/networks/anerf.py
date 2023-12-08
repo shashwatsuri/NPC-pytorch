@@ -170,8 +170,9 @@ class ANeRF(nn.Module):
         n_framecodes: int, number of framecodes
         density_noise_std: float, noise to apply on density during training time
         '''
+        print("what about now")
+        print(cam_cal)
         super(ANeRF, self).__init__()
-
         self.D = D
         self.W = W
         self.view_W = view_W
@@ -197,8 +198,10 @@ class ANeRF(nn.Module):
         self.init_density_net()
         self.init_radiance_net()
         self.init_bkgd_net(bkgd_net)
-
         self.cam_cal = None
+        # cam_cal = kwargs.get("camcal",None)
+        # print("APPLE")
+        # print(cam_cal)
         if cam_cal is not None:
             self.cam_cal = CamCal(**cam_cal)
         

@@ -71,7 +71,7 @@ class NeRFRGBLoss(BaseLoss):
 class SoftSoftmaxLoss(BaseLoss):
 
     def forward(self, batch: Mapping[str, Any], preds: Mapping[str, Any], model: Callable, **kwargs):
-
+        # breakpoint()
         a = preds['agg_logit']
         labels = ((preds['T_i'] * preds['alpha']) > 0).float()
 
