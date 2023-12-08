@@ -29,16 +29,17 @@ class CamCal(nn.Module):
         R = torch.eye(3)[None] 
         Rvec = rot_to_rot6d(R).expand(n_cams, -1)
 
-
         if self.load_path is not None:
             device = Rvec.device
             Rvec = torch.load(load_path, map_location=device)
-
+        
+        Rvec = self.add_normal_noise(Rvec,error)
         self.register_parameter('Rvec', nn.Parameter(Rvec.clone(), requires_grad=not self.stop_opt))
         
         if self.opt_T:
             T = torch.zeros(3)[None]
             T = T.expand(n_cams, -1)
+            T = self.add_normal_noise(T,error)
             self.register_parameter('T', nn.Parameter(T.clone(), requires_grad=not self.stop_opt))
 
     
