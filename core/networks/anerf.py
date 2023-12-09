@@ -170,8 +170,6 @@ class ANeRF(nn.Module):
         n_framecodes: int, number of framecodes
         density_noise_std: float, noise to apply on density during training time
         '''
-        print("what about now")
-        print(cam_cal)
         super(ANeRF, self).__init__()
         self.D = D
         self.W = W

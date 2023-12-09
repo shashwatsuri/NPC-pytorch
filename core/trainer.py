@@ -192,7 +192,7 @@ class Trainer(object):
         batch['device_cnt'] = device_cnt
         batch['global_iter'] = global_iter
         preds = self.model(batch, pose_opt=self.config.get('pose_opt', False))
-
+        breakpoint()
         # Step 2. compute loss
         # TODO: used to have pose-optimization here ..
         loss, stats = self.compute_loss(batch, preds, global_iter=global_iter)

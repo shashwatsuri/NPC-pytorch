@@ -7,7 +7,7 @@ from core.utils.skeleton_utils import *
 from typing import Optional, Any
 
 
-
+#TODO: OPT_T ALWAYS ASSUMED TO BE TRUE
 class CamCal(nn.Module):
 
     def __init__(
@@ -15,7 +15,7 @@ class CamCal(nn.Module):
         n_cams: int = 3,
         load_path: Optional[str] = None,
         stop_opt: bool = False,
-        opt_T: bool = False,
+        opt_T: bool = True,
         error: float = 0.0
     ):
         super().__init__()
@@ -32,15 +32,20 @@ class CamCal(nn.Module):
             device = Rvec.device
             Rvec = torch.load(load_path, map_location=device)
 
-        self.register_parameter('Rvec', nn.Parameter(Rvec.clone(), requires_grad=not self.stop_opt))
         
-        if self.opt_T:
-            T = torch.zeros(3)[None]
-            T = T.expand(n_cams, -1)
-            self.register_parameter('T', nn.Parameter(T.clone(), requires_grad=not self.stop_opt))
-
+        T = torch.zeros(3)[None]
+        T = T.expand(n_cams, -1)
+        
         print("successfully initialized cam_cal")
-    
+        #concatenate Rvec and T into 1 array per cam
+        x = torch.cat((Rvec,T),dim=1)
+        zca_matrices = torch.stack([self.zca_matrix(x[i]) for i in range(x.size(0))])
+        # self.register_buffer("zca_matrices",zca_matrices)
+
+        self.register_parameter('Rvec', nn.Parameter(Rvec.clone(), requires_grad=not self.stop_opt))
+        self.register_parameter('T', nn.Parameter(T.clone(), requires_grad=not self.stop_opt))
+
+
     def add_normal_noise(self, tensor, std=0.005):
         """
         Add random noise from a normal distribution to a PyTorch tensor.
@@ -58,13 +63,12 @@ class CamCal(nn.Module):
         assert tensor.size() == noisy_tensor.size()
         return noisy_tensor
 
-    def zca_matrix(X):
+    def zca_matrix(self,X):
         # Calculate covariance matrix
-        cov_matrix = torch.matmul(X.t(), X) / X.size(0)
-
+        X=X.unsqueeze(0)
+        covariance_matrix = torch.matmul(X.t(), X)
         # Perform eigen decomposition
-        U, S, _ = torch.svd(cov_matrix)
-
+        U, S, _ = torch.svd(covariance_matrix)
         # Apply ZCA whitening transformation
         epsilon = 1e-5  # Small constant to avoid division by zero
         X_zca = torch.matmul(torch.matmul(U, torch.diag(1.0 / torch.sqrt(S + epsilon))), U.t())
