@@ -14,34 +14,32 @@ class CamCal(nn.Module):
         self,
         n_cams: int = 3,
         load_path: Optional[str] = None,
-        identity_cam: int = 0,
         stop_opt: bool = False,
         opt_T: bool = False,
         error: float = 0.0
     ):
         super().__init__()
         self.n_cams = n_cams
-        self.identity_cam = identity_cam
         self.load_path = load_path
         self.stop_opt = stop_opt
         self.opt_T = opt_T
 
         R = torch.eye(3)[None] 
         Rvec = rot_to_rot6d(R).expand(n_cams, -1)
+    
 
         if self.load_path is not None:
             device = Rvec.device
             Rvec = torch.load(load_path, map_location=device)
-        
-        Rvec = self.add_normal_noise(Rvec,error)
+
         self.register_parameter('Rvec', nn.Parameter(Rvec.clone(), requires_grad=not self.stop_opt))
         
         if self.opt_T:
             T = torch.zeros(3)[None]
             T = T.expand(n_cams, -1)
-            T = self.add_normal_noise(T,error)
             self.register_parameter('T', nn.Parameter(T.clone(), requires_grad=not self.stop_opt))
 
+        print("successfully initialized cam_cal")
     
     def add_normal_noise(self, tensor, std=0.005):
         """
@@ -60,6 +58,18 @@ class CamCal(nn.Module):
         assert tensor.size() == noisy_tensor.size()
         return noisy_tensor
 
+    def zca_matrix(X):
+        # Calculate covariance matrix
+        cov_matrix = torch.matmul(X.t(), X) / X.size(0)
+
+        # Perform eigen decomposition
+        U, S, _ = torch.svd(cov_matrix)
+
+        # Apply ZCA whitening transformation
+        epsilon = 1e-5  # Small constant to avoid division by zero
+        X_zca = torch.matmul(torch.matmul(U, torch.diag(1.0 / torch.sqrt(S + epsilon))), U.t())
+
+        return X_zca
     
     def forward(
         self,
@@ -78,11 +88,11 @@ class CamCal(nn.Module):
         if self.stop_opt:
             Rvec = Rvec.detach()
         R = rot6d_to_rotmat(Rvec)
-        masks = (cam_idxs == self.identity_cam).float()
-        masks = masks.reshape(-1, 1, 1)
-        identity = torch.eye(3)[None]
+        # masks = (cam_idxs == self.identity_cam).float()
+        # masks = masks.reshape(-1, 1, 1)
+        # identity = torch.eye(3)[None]
         # breakpoint()
-        R = R[cam_idxs] * (1 - masks) + identity * masks
+        R = R[cam_idxs]
 
         rays_o = batch['rays_o']
         rays_d = batch['rays_d']
@@ -91,9 +101,9 @@ class CamCal(nn.Module):
         rays_d_cal = (rays_d[:, None] @ R)
         if self.opt_T:
             T = self.T
-            masks = masks.reshape(-1, 1) 
-            identity = torch.zeros(3)[None]
-            T = T[cam_idxs] * (1 - masks) + identity * masks
+            # masks = masks.reshape(-1, 1) 
+            # identity = torch.zeros(3)[None]
+            T = T[cam_idxs]
             if self.stop_opt:
                 T = T.detach()
             rays_o_cal = rays_o[:, None] + T[:, None]
