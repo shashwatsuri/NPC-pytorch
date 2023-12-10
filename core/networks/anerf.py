@@ -13,6 +13,8 @@ from core.utils.skeleton_utils import (
     SMPLSkeleton,
     get_skel_profile_from_rest_pose,
     calculate_kinematic,
+    rot_to_rot6d,
+    rot6d_to_rotmat
 )
 
 from einops import rearrange
@@ -126,6 +128,32 @@ def merge_samples(
 
     return x_is
 
+def perspective_projection(vec):
+    """
+    Perform perspective projection of 3D points to 2D using extrinsic camera parameters.
+
+    Args:
+    - vec (array): 9 values of the for [Rvec6d,t] camera matrix (projection matrix).
+
+    Returns:
+    - points_2d (ndarray): Nx2 array of 2D points.
+    """
+    points_3d = torch.randn(100,3)
+    Rvec = vec[:6]
+    t = vec[6:]
+    rotmat = rot6d_to_rotmat(Rvec)
+    camera_matrix = torch.concatenate((rotmat, t.reshape(3, 1)), axis=1)
+    # Add a homogeneous coordinate (1) to the 3D points
+    points_3d_homogeneous = torch.hstack((points_3d, torch.ones((points_3d.shape[0], 1))))
+
+    # Perform perspective projection
+    points_2d_homogeneous = torch.matmul(camera_matrix, points_3d_homogeneous.T).T
+
+    # Normalize homogeneous coordinates
+    points_2d_normalized = points_2d_homogeneous[:, :2] / points_2d_homogeneous[:, 2:]
+
+    return points_2d_normalized
+
 class ANeRF(nn.Module):
 
     def __init__(
@@ -197,10 +225,28 @@ class ANeRF(nn.Module):
         self.init_radiance_net()
         self.init_bkgd_net(bkgd_net)
         self.cam_cal = None
-        # cam_cal = kwargs.get("camcal",None)
-        # print("APPLE")
-        # print(cam_cal)
         if cam_cal is not None:
+
+            # construct the camp matrix
+            c2ws = kwargs['c2ws']
+            P= torch.zeros((3,9,9))
+            for c2w in c2ws:
+                rotmat = torch.tensor(c2w[:3,:3][None])
+                rvec6d = rot_to_rot6d(rotmat)[0]
+                t = torch.tensor(c2w[:3,3])
+                vec = torch.concat((rvec6d,t),dim=0)
+                sample = perspective_projection(vec)
+                jacobian = torch.autograd.functional.jacobian(perspective_projection,vec)
+                squish_jacobian = jacobian.reshape(-1,jacobian.size(-1))
+                covariance_matrix = torch.matmul(squish_jacobian.t(),squish_jacobian)
+                lambda_ = 5
+                mu = 1e-8
+                imp_cv = covariance_matrix + (lambda_*torch.diag(covariance_matrix)) + (mu * torch.eye(9))
+                assert not torch.isnan(imp_cv.sqrt()).any(), "covariance matrix has negative values, change lambda_ to make them positive"
+                i=0
+                P[i] = imp_cv.sqrt()
+                i+=1
+            breakpoint
             self.cam_cal = CamCal(**cam_cal)
         
         self.pose_opt = None
@@ -222,6 +268,8 @@ class ANeRF(nn.Module):
             return self.input_ch_view + self.framecode_ch + self.W
         return self.input_ch_view + self.W
     
+    
+        
     def init_skeleton(self, skel_type: Skeleton, rest_pose: np.ndarray):
         self.register_buffer('rest_pose', torch.tensor(rest_pose))
         self.skel_profile = get_skel_profile_from_rest_pose(rest_pose, skel_type)
