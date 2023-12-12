@@ -247,8 +247,7 @@ class Trainer(object):
         for loss_fn in self.loss_fns:
             loss, loss_stat = loss_fn(batch, preds, global_iter=global_iter, model=model)
             total_loss += loss
-            loss_stats.update(**loss_stat)
-        
+            loss_stats.update(**loss_stat)         
         # get extra stats that's irrelevant to loss
         loss_stats.update(psnr=img2psnr(preds['rgb_map'], batch['target_s']).item())
         if 'rgb0' in preds:

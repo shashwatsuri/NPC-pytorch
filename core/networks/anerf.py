@@ -241,11 +241,13 @@ class ANeRF(nn.Module):
                 jacobian = torch.autograd.functional.jacobian(perspective_projection,vec)
                 squish_jacobian = jacobian.reshape(-1,jacobian.size(-1))
                 covariance_matrix = torch.matmul(squish_jacobian.t(),squish_jacobian)
-                lambda_ = 5
+                lambda_ = 1e-1
                 mu = 1e-8
-                imp_cv = covariance_matrix + (lambda_*torch.diag(covariance_matrix)) + (mu * torch.eye(9))
+                # imp_cv = (covariance_matrix - torch.min(covariance_matrix))
+                # print(imp_cv)
+                imp_cv = torch.relu(covariance_matrix) + (lambda_*torch.diag(covariance_matrix)) + (mu * torch.eye(9))
                 assert not torch.isnan(imp_cv.sqrt()).any(), "covariance matrix has negative values, change lambda_ to make them positive"
-                P[i] = imp_cv.sqrt()
+                P[i] = torch.inverse(imp_cv.sqrt())
                 invP[i] = torch.inverse(P[i])
                 i+=1
             self.cam_cal = CamCal(P,invP,**cam_cal)

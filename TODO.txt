@@ -2,3 +2,9 @@
 2)remember you need dpi/dphi not dl/dphi so you dont need the backprop stuff i dont think
 3)identitycam might need a comeback
 4)the way you have generated the noise is wrong, we need absolute noise and then a way to use those exact parameters with camP. maybe use load_path with those residuals and then have a camP flag
+
+
+
+------------------------------------------------
+camP no error relu -> temp2
+Iter: 0010000, psnr_bbox: 26.968975, ssim_bbox: 0.933630, psnr_fg: 19.376663, ssim_fg: 0.638270, lpips: 0.066531

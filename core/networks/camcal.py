@@ -9,42 +9,42 @@ from typing import Optional, Any
 
 
 def whiten(camvec9d,P1):
-    return camvec9d
-    # return torch.matmul(P1,camvec9d.T).T
+    # return camvec9d
+    return torch.matmul(P1,camvec9d.T).T
 
 def dewhiten(camvec9d,invP1):
-    return camvec9d
-    # return torch.matmul(invP1,camvec9d.T).T
+    # return camvec9d
+    return torch.matmul(invP1,camvec9d.T).T
 
 
-def add_normal_noise(self, tensor, std=0.005):
-    """
-    Add random noise from a normal distribution to a PyTorch tensor.
+# def add_normal_noise(self, tensor, std=0.005):
+#     """
+#     Add random noise from a normal distribution to a PyTorch tensor.
 
-    Parameters:
-    - tensor (torch.Tensor): Input tensor to which noise will be added.
-    - mean (float): Mean of the normal distribution (default is 0).
-    - std (float): Standard deviation of the normal distribution (default is 0.005).
+#     Parameters:
+#     - tensor (torch.Tensor): Input tensor to which noise will be added.
+#     - mean (float): Mean of the normal distribution (default is 0).
+#     - std (float): Standard deviation of the normal distribution (default is 0.005).
 
-    Returns:
-    - torch.Tensor: Tensor with added noise.
-    """
-    noise = torch.randn_like(tensor) * std
-    noisy_tensor = tensor + noise
-    assert tensor.size() == noisy_tensor.size()
-    return noisy_tensor
+#     Returns:
+#     - torch.Tensor: Tensor with added noise.
+#     """
+#     noise = torch.randn_like(tensor) * std
+#     noisy_tensor = tensor + noise
+#     assert tensor.size() == noisy_tensor.size()
+#     return noisy_tensor
 
-def zca_matrix(self,X):
-    # Calculate covariance matrix
-    X=X.unsqueeze(0)
-    covariance_matrix = torch.matmul(X.t(), X)
-    # Perform eigen decomposition
-    U, S, _ = torch.svd(covariance_matrix)
-    # Apply ZCA whitening transformation
-    epsilon = 1e-5  # Small constant to avoid division by zero
-    X_zca = torch.matmul(torch.matmul(U, torch.diag(1.0 / torch.sqrt(S + epsilon))), U.t())
+# def zca_matrix(self,X):
+#     # Calculate covariance matrix
+#     X=X.unsqueeze(0)
+#     covariance_matrix = torch.matmul(X.t(), X)
+#     # Perform eigen decomposition
+#     U, S, _ = torch.svd(covariance_matrix)
+#     # Apply ZCA whitening transformation
+#     epsilon = 1e-5  # Small constant to avoid division by zero
+#     X_zca = torch.matmul(torch.matmul(U, torch.diag(1.0 / torch.sqrt(S + epsilon))), U.t())
 
-    return X_zca
+#     return X_zca
 
 
 #TODO: OPT_T ALWAYS ASSUMED TO BE TRUE
@@ -55,6 +55,7 @@ class CamCal(nn.Module):
         P,
         invP,
         n_cams: int = 3,
+        identity_cam:int = 0,
         load_path: Optional[str] = None,
         stop_opt: bool = False,
         opt_T: bool = True,
@@ -62,6 +63,7 @@ class CamCal(nn.Module):
     ):
         super().__init__()
         self.n_cams = n_cams
+        self.identity_cam = identity_cam
         self.load_path = load_path
         self.stop_opt = stop_opt
         self.opt_T = opt_T
@@ -103,6 +105,7 @@ class CamCal(nn.Module):
         # T = self.T
 
         op_camvec = self.op_camvec
+        # print(op_camvec[0])
         P = self.P
         invP = self.invP
 
@@ -115,20 +118,18 @@ class CamCal(nn.Module):
             T[i] = camvec[6:]
 
         R = rot6d_to_rotmat(Rvec)
-        # masks = (cam_idxs == self.identity_cam).float()
-        # masks = masks.reshape(-1, 1, 1)
-        # identity = torch.eye(3)[None]
-        # breakpoint()
-        R = R[cam_idxs]
-
+        masks = (cam_idxs == self.identity_cam).float()
+        masks = masks.reshape(-1, 1, 1)
+        identity = torch.eye(3)[None]
+        R = R[cam_idxs] * (1 - masks) + identity * masks
         rays_o = batch['rays_o']
         rays_d = batch['rays_d']
 
         # adjust the ray
         rays_d_cal = (rays_d[:, None] @ R)
-        # masks = masks.reshape(-1, 1) 
-        # identity = torch.zeros(3)[None]
-        T = T[cam_idxs]
+        masks = masks.reshape(-1, 1) 
+        identity = torch.zeros(3)[None]
+        T = T[cam_idxs] * (1 - masks) + identity * masks        
         rays_o_cal = rays_o[:, None] + T[:, None]
         pts_cal = rays_d_cal * z_vals[..., None] + rays_o_cal
 
