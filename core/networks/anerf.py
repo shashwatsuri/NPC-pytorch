@@ -230,6 +230,8 @@ class ANeRF(nn.Module):
             # construct the camp matrix
             c2ws = kwargs['c2ws']
             P= torch.zeros((3,9,9))
+            invP = torch.zeros((3,9,9))
+            i=0
             for c2w in c2ws:
                 rotmat = torch.tensor(c2w[:3,:3][None])
                 rvec6d = rot_to_rot6d(rotmat)[0]
@@ -243,11 +245,10 @@ class ANeRF(nn.Module):
                 mu = 1e-8
                 imp_cv = covariance_matrix + (lambda_*torch.diag(covariance_matrix)) + (mu * torch.eye(9))
                 assert not torch.isnan(imp_cv.sqrt()).any(), "covariance matrix has negative values, change lambda_ to make them positive"
-                i=0
                 P[i] = imp_cv.sqrt()
+                invP[i] = torch.inverse(P[i])
                 i+=1
-            breakpoint
-            self.cam_cal = CamCal(**cam_cal)
+            self.cam_cal = CamCal(P,invP,**cam_cal)
         
         self.pose_opt = None
         if pose_opt is not None:
