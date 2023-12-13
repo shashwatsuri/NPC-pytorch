@@ -5,6 +5,7 @@ import torch.nn.functional as F
 import numpy as np
 from core.utils.skeleton_utils import *
 from typing import Optional, Any
+from torch.utils.tensorboard import SummaryWriter
 
 
 
@@ -16,6 +17,11 @@ def dewhiten(camvec9d,invP1):
     # return camvec9d
     return torch.matmul(invP1,camvec9d.T).T
 
+def angular_distance(R1, R2):
+    trace_value = torch.trace(torch.mm(R1.t(), R2))
+    trace_value = torch.clamp(trace_value, -1.0, 1.0)  # Ensure the value is within the valid range for arccos
+    angle = torch.acos((trace_value - 1.0) / 2.0)
+    return angle
 
 # def add_normal_noise(self, tensor, std=0.005):
 #     """
@@ -52,6 +58,8 @@ class CamCal(nn.Module):
 
     def __init__(
         self,
+        RotMats,
+        Ts,
         P,
         invP,
         n_cams: int = 3,
@@ -79,16 +87,22 @@ class CamCal(nn.Module):
             camvec9d = torch.concat((Rvec[i],T[i]))[None]
             op_camvec9d = whiten(camvec9d,P[i])[0]
             op_camvec[i] = op_camvec9d
-        print("successfully initialized cam_cal")
+        print("successfully initialized cam_cal")        
+
         # self.register_parameter('Rvec', nn.Parameter(Rvec.clone(), requires_grad=not self.stop_opt))
         # self.register_parameter('T', nn.Parameter(T.clone(), requires_grad=not self.stop_opt))
         self.register_parameter('op_camvec', nn.Parameter(op_camvec.clone(), requires_grad=not self.stop_opt))
         self.register_buffer('P',P)
         self.register_buffer('invP',invP)
+        self.register_buffer('RotMats',RotMats)
+        self.register_buffer('Ts',Ts)
+        self.register_buffer('Rerr',torch.Tensor(0))
+        self.register_buffer('Terr',torch.Tensor(0))
 
-    
-    
-    
+
+
+
+
     def forward(
         self,
         batch: dict,
@@ -133,6 +147,15 @@ class CamCal(nn.Module):
         rays_o_cal = rays_o[:, None] + T[:, None]
         pts_cal = rays_d_cal * z_vals[..., None] + rays_o_cal
 
+        #calculate error
+        RotMats = self.RotMats
+        Ts = self.Ts
+        Rerr = angular_distance(RotMats[0],R[0]) + angular_distance(RotMats[1],R[1]) + angular_distance(RotMats[2],R[2])
+        Terr = torch.norm(Ts[0] - T[0]) + torch.norm(Ts[1] - T[1]) + torch.norm(Ts[2] - T[2])
+        self.Rerr = Rerr
+        self.Terr = Terr
+
+        # update points and rays
         batch.update(
             pts=pts_cal,
             rays_d=rays_d_cal[:, 0],

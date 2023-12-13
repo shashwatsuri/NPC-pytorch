@@ -191,6 +191,7 @@ class Trainer(object):
         batch['N_unique'] = self.full_config.N_sample_images // device_cnt
         batch['device_cnt'] = device_cnt
         batch['global_iter'] = global_iter
+
         preds = self.model(batch, pose_opt=self.config.get('pose_opt', False))
         # Step 2. compute loss
         # TODO: used to have pose-optimization here ..
@@ -199,7 +200,6 @@ class Trainer(object):
         loss.backward()
         # param_names_to_get = ['module.cam_cal.Rvec', 'module.cam_cal.T']
         # selected_params = [(name, param) for name, param in self.model.named_parameters() if name in param_names_to_get]        
-        # breakpoint()
         self.optimizer.step()
         total_norm, avg_norm = get_gradnorm(self.model)
         self.optimizer.zero_grad()

@@ -8,3 +8,5 @@
 ------------------------------------------------
 camP no error relu -> temp2
 Iter: 0010000, psnr_bbox: 26.968975, ssim_bbox: 0.933630, psnr_fg: 19.376663, ssim_fg: 0.638270, lpips: 0.066531
+camP no error relu -> temp2
+Iter: 0010000, psnr_bbox: 26.944637, ssim_bbox: 0.933442, psnr_fg: 19.389656, ssim_fg: 0.635808, lpips: 0.067178                                                                                                

@@ -232,10 +232,14 @@ class ANeRF(nn.Module):
             P= torch.zeros((3,9,9))
             invP = torch.zeros((3,9,9))
             i=0
+            RotMats = torch.zeros((3,3,3))
+            Ts = torch.zeros((3,3))
             for c2w in c2ws:
-                rotmat = torch.tensor(c2w[:3,:3][None])
+                rotmat = torch.tensor(c2w[:3,:3][None]) # 1,3,3
+                RotMats[i] = rotmat.squeeze(dim=0)
                 rvec6d = rot_to_rot6d(rotmat)[0]
                 t = torch.tensor(c2w[:3,3])
+                Ts[i] = t
                 vec = torch.concat((rvec6d,t),dim=0)
                 sample = perspective_projection(vec)
                 jacobian = torch.autograd.functional.jacobian(perspective_projection,vec)
@@ -250,7 +254,7 @@ class ANeRF(nn.Module):
                 P[i] = torch.inverse(imp_cv.sqrt())
                 invP[i] = torch.inverse(P[i])
                 i+=1
-            self.cam_cal = CamCal(P,invP,**cam_cal)
+            self.cam_cal = CamCal(RotMats,Ts,P,invP,**cam_cal)
         
         self.pose_opt = None
         if pose_opt is not None:
