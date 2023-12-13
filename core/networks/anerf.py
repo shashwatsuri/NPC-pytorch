@@ -254,7 +254,7 @@ class ANeRF(nn.Module):
                 P[i] = torch.inverse(imp_cv.sqrt())
                 invP[i] = torch.inverse(P[i])
                 i+=1
-            self.cam_cal = CamCal(RotMats,Ts,P,invP,**cam_cal)
+            self.cam_cal = CamCal(P,invP,**cam_cal)
         
         self.pose_opt = None
         if pose_opt is not None:

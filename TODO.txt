@@ -6,7 +6,14 @@
 
 
 ------------------------------------------------
+CUDA_VISIBLE_DEVICES=1 python train.py --config-name danbo_vof basedir=logs expname=danbo_S5_zca_005 dataset=h36m_zju dataset.subject=S5 num_workers=4 iters=10000 model.cam_cal.zca=true model.cam_cal.error=0.005
+------------------------------------------------
 camP no error relu -> temp2
 Iter: 0010000, psnr_bbox: 26.968975, ssim_bbox: 0.933630, psnr_fg: 19.376663, ssim_fg: 0.638270, lpips: 0.066531
 camP no error relu -> temp2
-Iter: 0010000, psnr_bbox: 26.944637, ssim_bbox: 0.933442, psnr_fg: 19.389656, ssim_fg: 0.635808, lpips: 0.067178                                                                                                
+Iter: 0010000, psnr_bbox: 26.944637, ssim_bbox: 0.933442, psnr_fg: 19.389656, ssim_fg: 0.635808, lpips: 0.067178   
+
+danbo_S5_zca_005
+Iter: 0010000, psnr_bbox: 26.985550, ssim_bbox: 0.934380, psnr_fg: 19.379635, ssim_fg: 0.641421, lpips: 0.067015
+danbo_S5_nozca_005
+Iter: 0010000, psnr_bbox: 26.862679, ssim_bbox: 0.932800, psnr_fg: 19.348106, ssim_fg: 0.634768, lpips: 0.066348                                                                                                         

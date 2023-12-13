@@ -90,7 +90,6 @@ def find_ckpts(config: DictConfig, log_path: str, ckpt_path: Optional[str] = Non
 
 
 def train(config: DictConfig):
-
     # create directory and save config
     expname, basedir = config.expname, config.basedir
     log_path = os.path.join(basedir, expname)

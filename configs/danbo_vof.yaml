@@ -19,7 +19,7 @@ model:
 
   cam_cal:
     n_cams: 3
-    stop_opt: False
+    zca: False
     opt_T: True
     error: 0.00
 
