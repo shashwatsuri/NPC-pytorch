@@ -24,4 +24,20 @@ Iter: 0010000, psnr_bbox: 26.892879, ssim_bbox: 0.933960, psnr_fg: 19.369022, ss
 danbo_S5_zca_02
 Iter: 0010000, psnr_bbox: 24.736542, ssim_bbox: 0.917515, psnr_fg: 16.751150, ssim_fg: 0.506513, lpips: 0.078171 
 danbo_S5_nozca_02
-Iter: 0010000, psnr_bbox: 21.187561, ssim_bbox: 0.836866, psnr_fg: 14.642023, ssim_fg: 0.398163, lpips: 0.141184                                                                                                                                                                                                  
+Iter: 0010000, psnr_bbox: 21.187561, ssim_bbox: 0.836866, psnr_fg: 14.642023, ssim_fg: 0.398163, lpips: 0.141184 
+danbo_S5_zca_0075
+Iter: 0010000, psnr_bbox: 26.974493, ssim_bbox: 0.933809, psnr_fg: 19.299801, ssim_fg: 0.633335, lpips: 0.067455                                                                               
+danbo_S5_nozca_0075
+Iter: 0010000, psnr_bbox: 26.833393, ssim_bbox: 0.932167, psnr_fg: 19.278889, ssim_fg: 0.630908, lpips: 0.067338
+danbo_S5_zca_0025
+Iter: 0010000, psnr_bbox: 26.963671, ssim_bbox: 0.933566, psnr_fg: 19.360512, ssim_fg: 0.634118, lpips: 0.068100
+danbo_S5_nozca_0025                                                                                                                                 
+Iter: 0010000, psnr_bbox: 26.942497, ssim_bbox: 0.933329, psnr_fg: 19.247677, ssim_fg: 0.633651, lpips: 0.067301                                                                               
+
+
+#danbo_S5_zca_015
+#Iter: 0010000, psnr_bbox: 24.927494, ssim_bbox: 0.918910, psnr_fg: 16.860863, ssim_fg: 0.513364, lpips: 0.076262 
+#danbo_S5_zca_005_scaled
+#Iter: 0010000, psnr_bbox: 26.971233, ssim_bbox: 0.932949, psnr_fg: 19.026802, ssim_fg: 0.626937, lpips: 0.068999  
+#danbo_S5_zca_01_scaled    
+#Iter: 0010000, psnr_bbox: 26.966429, ssim_bbox: 0.933039, psnr_fg: 19.011717, ssim_fg: 0.628531, lpips: 0.068596         

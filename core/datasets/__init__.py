@@ -9,3 +9,4 @@ from .zju import ZJUMocapDataset, ZJUH36MDataset
 from .perfcap import MonoPerfCapDataset
 from .neural_actor import NeuralActorDataset
 from .asmr import ASMRDataset
+from .gscreal import GSCRealSMPLDataset
