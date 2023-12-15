@@ -62,7 +62,6 @@ class CamCal(nn.Module):
     ):
         super().__init__()
         self.n_cams = n_cams
-        self.identity_cam = identity_cam
         self.load_path = load_path
         self.zca = zca
         self.opt_T = opt_T
@@ -100,7 +99,7 @@ class CamCal(nn.Module):
     ):
         # print("im forwarding as well")
         if 'real_cam_idx' not in batch:
-            cam_idxs = torch.zeros(z_vals.shape[0]).long() + self.identity_cam
+            cam_idxs = torch.zeros(z_vals.shape[0]).long()# + self.identity_cam
         else:
             cam_idxs = batch['real_cam_idx']
 
@@ -177,10 +176,10 @@ class ColorCal(nn.Module):
         rgb_map: torch.Tensor,
         **kwargs,
     ):
-        if batch is None or 'real_cam_idx' not in batch:
+        if batch is None or 'cam_idxs' not in batch:
             cam_idxs = torch.zeros(rgb_map.shape[0]).long() + self.identity_cam
         else:
-            cam_idxs = batch['real_cam_idx']
+            cam_idxs = batch['cam_idxs']
 
         cal = self.cal
         if self.load_path is not None:
