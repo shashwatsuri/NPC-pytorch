@@ -65,6 +65,7 @@ class CamCal(nn.Module):
         self.load_path = load_path
         self.zca = zca
         self.opt_T = opt_T
+        self.identity_cam = identity_cam
         R = torch.eye(3)[None] #([1,3,3])
         Rvec = rot_to_rot6d(R).expand(n_cams, -1) #([3,6])
         T = torch.zeros(3)[None]

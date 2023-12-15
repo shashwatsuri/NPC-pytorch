@@ -142,15 +142,16 @@ def train(config: DictConfig):
             to_print = ['total_loss', 'psnr', 'alpha', 'lr'] # things to print out
             mem = torch.cuda.max_memory_allocated() / 1024. / 1024.
             output_str = f'Iter: {i:07d}'
-            # param_names_to_get = ['module.cam_cal.rerr', 'module.cam_cal.terr']
-            # selected_params = [(name, param) for name, param in model.named_parameters() if name in param_names_to_get]
             for k, v in training_stats.items():
                 if k in to_print:
                     output_str = f'{output_str}, {k}: {v:.6f}'
                 # write to tensorboard
                 writer.add_scalar(f'Stats/{k}', v, i)
-            writer.add_scalar(f'Stats/Rerr',model.cam_cal.Rerr,i)
-            writer.add_scalar(f'Stats/Terr',model.cam_cal.Terr,i)
+
+            if(model.cam_cal is not None): 
+                writer.add_scalar(f'Stats/Rerr',model.cam_cal.Rerr,i)
+                writer.add_scalar(f'Stats/Terr',model.cam_cal.Terr,i)
+            
             output_str = f'{output_str}, peak_mem: {mem:.6f}'
             tqdm.write(output_str)
 

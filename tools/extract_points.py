@@ -13,6 +13,9 @@ from omegaconf import OmegaConf
 from train import build_model, find_ckpts
 from core.utils.skeleton_utils import *
 from core.utils.visualization import *
+from pytorch3d.structures import Pointclouds
+from pytorch3d.io import IO
+
 
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
 torch.multiprocessing.set_start_method('spawn')
@@ -307,12 +310,20 @@ def extract_mcubes(configs):
         valid_anchors = apts[valid > 0][fps_idx]
         extracted['anchor_pts'].append(valid_anchors)
         extracted['canon_pts'].append(valid_pts[fps_idx])
+    #anchor pts pc
+    # pc = torch.vstack(extracted['anchor_pts'])
+    # pc = Pointclouds(points=[pc])
+    # file_path = "logs/temp.ply"
+    # IO().save_pointcloud(pc, file_path)
+
 
     # save the extracted point cloud image
     img = byte2array(fig.to_image(format='png'))
     torch.save(extracted, configs.output_name)
     imageio.imwrite(configs.output_name.replace('.th', '.png'), img)
     print(f'Done extraction. Output saved to {configs.output_name}')
+    
+
 
 
 if __name__ == '__main__':

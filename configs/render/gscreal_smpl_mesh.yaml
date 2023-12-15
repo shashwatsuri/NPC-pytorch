@@ -1,0 +1,12 @@
+forward_type: geometry
+
+render_dataset:
+  _target_: run_render.MeshRenderDataset
+  subject: Shashwat_01_smpl
+  h5_path: data/smpl/${.subject}_val.h5
+  idxs: np.arange(1)
+  mcube_resolution: 384
+
+
+model_config: logs/danbo_smpl_noscan/config.yaml
+output_path: outputs/temp/geometry
