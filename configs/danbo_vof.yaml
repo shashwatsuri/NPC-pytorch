@@ -1,6 +1,6 @@
 defaults:
   - basic
-  - dataset: h36m_zju
+  - dataset: gscreal_smpl
 
 
 model:
@@ -17,11 +17,11 @@ model:
   framecode_ch: 128
   agg_type: sigmoid
 
-  cam_cal:
-    n_cams: 3
-    zca: False
-    opt_T: True
-    error: 0.00
+  # cam_cal:
+  #   n_cams: 3
+  #   zca: False
+  #   opt_T: True
+  #   error: 0.00
 
   graph_net:
     _target_: core.networks.gnn_backbone.DANBOGNN
