@@ -2,7 +2,7 @@ render_dataset:
   _target_: run_render.BaseRenderDataset
   subject: Shashwat_01_smpl
   h5_path: data/smpl/${.subject}_val.h5
-  idxs: np.arange(0,100,5)
+  idxs: np.arange(0,200,1)
   resolution: [1080,1920]
   cam_overwrite: -1
 
