@@ -2,10 +2,10 @@ render_dataset:
   _target_: run_render.BaseRenderDataset
   subject: Shashwat_01_smpl
   h5_path: data/smpl/${.subject}_val.h5
-  idxs: np.arange(9)
+  idxs: np.arange(0,100,5)
   resolution: [1080,1920]
   cam_overwrite: -1
 
 
 model_config: logs/danbo_smpl_noscan/config.yaml
-output_path: outputs/${render_datset.subject}/gscreal_smpl
+output_path: outputs/danbo_smpl_noscan/frames
