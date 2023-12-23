@@ -63,6 +63,9 @@ def build_model(config: DictConfig, data_attrs: Mapping[str, Any], ckpt=None):
     model = instantiate(config, **data_attrs, n_framecodes=n_framecodes, _recursive_=False)
 
     if ckpt is not None:
+        if(model.cam_cal is not None):
+            model.cam_cal.Rerr = ckpt['model']['cam_cal.Rerr']
+            model.cam_cal.Terr = ckpt['model']['cam_cal.Terr']
         ret = model.load_state_dict(ckpt['model'])
         tqdm.write(f'ckpt loading: {ret}')
 

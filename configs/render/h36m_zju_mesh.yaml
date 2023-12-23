@@ -9,4 +9,4 @@ render_dataset:
 
 
 model_config: logs/danbo_S5_noidentity/config.yaml
-output_path: outputs/S5/geometry
+output_path: outputs/h36m/S5/geometry

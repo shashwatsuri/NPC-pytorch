@@ -9,4 +9,4 @@ render_dataset:
 
 
 model_config: logs/danbo_smpl_noscan/config.yaml
-output_path: outputs/temp/geometry
+output_path: outputs/gscreal/Shashwat/geometry

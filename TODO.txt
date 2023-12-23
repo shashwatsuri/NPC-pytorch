@@ -11,16 +11,20 @@ CUDA_VISIBLE_DEVICES=1 python train.py --config-name danbo_vof basedir=logs expn
 camP no error relu -> temp2
 Iter: 0010000, psnr_bbox: 26.968975, ssim_bbox: 0.933630, psnr_fg: 19.376663, ssim_fg: 0.638270, lpips: 0.066531
 camP no error relu -> temp2
-Iter: 0010000, psnr_bbox: 26.944637, ssim_bbox: 0.933442, psnr_fg: 19.389656, ssim_fg: 0.635808, lpips: 0.067178   
+Iter: 0010000, psnr_bbox: 26.944637, ssim_bbox: 0.933442, psnr_fg: 19.389656, ssim_fg: 0.635808, lpips: 0.067178
 
+danbo_S5_vanilla_cal_zca
+Iter: 0010000, psnr_bbox: 26.961742, ssim_bbox: 0.933815, psnr_fg: 19.259293, ssim_fg: 0.636637, lpips: 0.067597
+danbo_S5_vanilla_cal
+Iter: 0010000, psnr_bbox: 26.815651, ssim_bbox: 0.931346, psnr_fg: 19.204202, ssim_fg: 0.623905, lpips: 0.066890                                                                                              
 danbo_S5_zca_005
 Iter: 0010000, psnr_bbox: 26.985550, ssim_bbox: 0.934380, psnr_fg: 19.379635, ssim_fg: 0.641421, lpips: 0.067015
 danbo_S5_nozca_005
 Iter: 0010000, psnr_bbox: 26.862679, ssim_bbox: 0.932800, psnr_fg: 19.348106, ssim_fg: 0.634768, lpips: 0.066348  
 danbo_S5_zca_01
-Iter: 0010000, psnr_bbox: 27.017868, ssim_bbox: 0.934175, psnr_fg: 19.193142, ssim_fg: 0.634015, lpips: 0.066882
+Iter: 0010000, psnr_bbox: 27.017868, ssim_bbox: 0.934175, psnr_fg: 19.393142, ssim_fg: 0.634015, lpips: 0.066082
 danbo_S5_nozca_01
-Iter: 0010000, psnr_bbox: 26.892879, ssim_bbox: 0.933960, psnr_fg: 19.369022, ssim_fg: 0.639730, lpips: 0.066048 
+Iter: 0010000, psnr_bbox: 26.892879, ssim_bbox: 0.933960, psnr_fg: 19.169022, ssim_fg: 0.631730, lpips: 0.066848 
 danbo_S5_zca_02
 Iter: 0010000, psnr_bbox: 24.736542, ssim_bbox: 0.917515, psnr_fg: 16.751150, ssim_fg: 0.506513, lpips: 0.078171 
 danbo_S5_nozca_02

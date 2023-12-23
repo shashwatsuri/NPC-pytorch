@@ -2,7 +2,7 @@ render_dataset:
   _target_: run_render.BaseRenderDataset
   subject: S5
   h5_path: data/h36m_zju/${.subject}_anim.h5
-  idxs: np.arange(66)
+  idxs: np.arange(15)
   resolution: [1000, 1000]
   cam_overwrite: -1
 

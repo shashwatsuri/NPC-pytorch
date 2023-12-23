@@ -4,8 +4,9 @@ h5_path: data/smpl/${.subject}_train.h5
 
 split: train
 patch_size: 1
-subject: Sequence1_smpl-new
+subject: Shashwat
 mask_img: True
 perturb_bg: True
 bkgd_mul: 1.0
 num_train_cams: 2
+bkgd_to_use: black
