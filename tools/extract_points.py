@@ -13,8 +13,8 @@ from omegaconf import OmegaConf
 from train import build_model, find_ckpts
 from core.utils.skeleton_utils import *
 from core.utils.visualization import *
-from pytorch3d.structures import Pointclouds
-from pytorch3d.io import IO
+# from pytorch3d.structures import Pointclouds
+# from pytorch3d.io import IO
 
 
 torch.set_default_tensor_type('torch.cuda.FloatTensor')
